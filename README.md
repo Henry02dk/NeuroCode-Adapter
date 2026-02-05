@@ -1,10 +1,7 @@
+
+---
+
 # NeuroCode Adapter: Technical Design Document
-
-## Neurodiversity-Adaptive Programming Assignment Extension
-
-**Project Code:** NeuroCode Adapter
-**Version:** 1.0
-**Date:** February 1, 2026
 
 ---
 
@@ -513,5 +510,3 @@ Expected structured output includes:
 The NeuroCode Adapter represents a comprehensive solution for inclusive computer science education. By combining VS Code extension capabilities with advanced LLM technology and neurodiversity research, the system provides personalized learning experiences for diverse learners. The modular architecture ensures maintainability, extensibility, and scalability for future enhancements.
 
 ---
-
-如果你愿意，下一步我可以帮你做一个 **DIKU master thesis 项目标准 README（老师一看就专业那种）**，因为现在这个版本更像 technical design doc，而不是 repo 首页 README。
