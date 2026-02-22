@@ -1,0 +1,60 @@
+{
+    "id": "example_fibonacci",
+    "title": "Fibonacci Sequence Generator",
+    "description": "Learn about recursive algorithms by implementing the Fibonacci sequence generator.",
+    "instructions": "The Fibonacci sequence is a series of numbers where each number is the sum of the two preceding ones. It starts with 0 and 1.\n\nSequence: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ...\n\n## Your Task\n\nWrite a function called `fibonacci` that takes a number `n` as input and returns the nth Fibonacci number.\n\n## Requirements\n\n1. Handle the base cases (n = 0 returns 0, n = 1 returns 1)\n2. Calculate Fibonacci numbers for n > 1\n3. You can use either recursion or iteration\n4. Handle invalid inputs (negative numbers)\n\n## Examples\n\n```javascript\nfibonacci(0);  // returns 0\nfibonacci(1);  // returns 1\nfibonacci(5);  // returns 5\nfibonacci(10); // returns 55\n```\n\n## Hints\n\n- **Recursive approach**: fibonacci(n) = fibonacci(n-1) + fibonacci(n-2)\n- **Iterative approach**: Use a loop to build up the sequence\n- The iterative approach is more efficient for larger values of n",
+    "starterCode": "function fibonacci(n) {\n  // Your code here\n  \n}\n\n// Test your function\nconsole.log(fibonacci(0));  // Expected: 0\nconsole.log(fibonacci(1));  // Expected: 1\nconsole.log(fibonacci(5));  // Expected: 5\nconsole.log(fibonacci(10)); // Expected: 55\n",
+    "testCases": [
+      {
+        "id": "test1",
+        "description": "Base case: n = 0",
+        "input": 0,
+        "expectedOutput": 0,
+        "hidden": false
+      },
+      {
+        "id": "test2",
+        "description": "Base case: n = 1",
+        "input": 1,
+        "expectedOutput": 1,
+        "hidden": false
+      },
+      {
+        "id": "test3",
+        "description": "Small value: n = 5",
+        "input": 5,
+        "expectedOutput": 5,
+        "hidden": false
+      },
+      {
+        "id": "test4",
+        "description": "Medium value: n = 10",
+        "input": 10,
+        "expectedOutput": 55,
+        "hidden": false
+      },
+      {
+        "id": "test5",
+        "description": "Larger value: n = 15",
+        "input": 15,
+        "expectedOutput": 610,
+        "hidden": true
+      },
+      {
+        "id": "test6",
+        "description": "Even larger: n = 20",
+        "input": 20,
+        "expectedOutput": 6765,
+        "hidden": true
+      }
+    ],
+    "metadata": {
+      "author": "NeuroCode Team",
+      "created": "2024-01-01T00:00:00Z",
+      "updated": "2024-01-01T00:00:00Z",
+      "difficulty": "intermediate",
+      "topics": ["recursion", "algorithms", "dynamic-programming"],
+      "estimatedTime": 45,
+      "language": "javascript"
+    }
+  }

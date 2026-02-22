@@ -1,0 +1,173 @@
+{
+  "name": "neurocode-adapter",
+  "displayName": "NeuroCode Adapter",
+  "description": "Adaptive programming assignment experience for neurodiverse learners",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Education",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "neurocode.openAssignment",
+        "title": "NeuroCode: Open Assignment"
+      },
+      {
+        "command": "neurocode.importAssignment",
+        "title": "NeuroCode: Import Assignment"
+      },
+      {
+        "command": "neurocode.configurePreferences",
+        "title": "NeuroCode: Configure Preferences"
+      },
+      {
+        "command": "neurocode.toggleAdaptiveMode",
+        "title": "NeuroCode: Toggle Adaptive Mode"
+      },
+      {
+        "command": "neurocode.exportProgress",
+        "title": "NeuroCode: Export Progress"
+      },
+      {
+        "command": "neurocode.getAIHelp",
+        "title": "NeuroCode: Get AI Help"
+      }
+    ],
+    "configuration": {
+      "title": "NeuroCode Adapter",
+      "properties": {
+        "neurocode.adaptiveMode": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable adaptive presentation features"
+        },
+        "neurocode.colorScheme": {
+          "type": "string",
+          "enum": [
+            "default",
+            "high-contrast",
+            "dyslexia-friendly",
+            "low-blue"
+          ],
+          "default": "default",
+          "description": "Color scheme for assignment display"
+        },
+        "neurocode.fontSize": {
+          "type": "string",
+          "enum": [
+            "small",
+            "medium",
+            "large",
+            "extra-large"
+          ],
+          "default": "medium",
+          "description": "Font size for assignment content"
+        },
+        "neurocode.fontFamily": {
+          "type": "string",
+          "enum": [
+            "default",
+            "dyslexia-friendly",
+            "monospace"
+          ],
+          "default": "default",
+          "description": "Font family for assignment display"
+        },
+        "neurocode.lineSpacing": {
+          "type": "number",
+          "default": 1.5,
+          "minimum": 1.0,
+          "maximum": 3.0,
+          "description": "Line spacing multiplier"
+        },
+        "neurocode.focusMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable focus mode to reduce distractions"
+        },
+        "neurocode.textToSpeech": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable text-to-speech for instructions"
+        },
+        "neurocode.aiProvider": {
+          "type": "string",
+          "enum": [
+            "anthropic",
+            "openai",
+            "local"
+          ],
+          "default": "anthropic",
+          "description": "AI provider for adaptive assistance"
+        },
+        "neurocode.mcpServerUrl": {
+          "type": "string",
+          "default": "http://localhost:3000",
+          "description": "MCP server URL"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "neurocode-explorer",
+          "title": "NeuroCode",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "neurocode-explorer": [
+        {
+          "id": "neurocode.assignmentView",
+          "name": "Assignments"
+        },
+        {
+          "id": "neurocode.progressView",
+          "name": "Progress"
+        },
+        {
+          "id": "neurocode.preferencesView",
+          "name": "Preferences"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && node esbuild.js --production",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.85.0",
+    "@types/mocha": "^10.x",
+    "@typescript-eslint/eslint-plugin": "^8.x",
+    "@typescript-eslint/parser": "^8.x",
+    "esbuild": "^0.19.x",
+    "eslint": "^9.x",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.3.x"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.0",
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "axios": "^1.6.0",
+    "marked": "^11.0.0",
+    "ws": "^8.16.0"
+  }
+}

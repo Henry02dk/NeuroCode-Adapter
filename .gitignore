@@ -1,0 +1,17 @@
+node_modules
+dist
+out
+.vscode-test
+*.vsix
+.DS_Store
+*.log
+.env
+.env.local
+*.swp
+*.swo
+*~
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
