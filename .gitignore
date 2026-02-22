@@ -1,4 +1,4 @@
-node_modules
+
 dist
 out
 .vscode-test
@@ -10,7 +10,6 @@ out
 *.swp
 *.swo
 *~
-.vscode/
 !.vscode/extensions.json
 !.vscode/launch.json
 !.vscode/settings.json
