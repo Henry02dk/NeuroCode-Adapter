@@ -5,12 +5,11 @@ import {
   ListToolsRequestSchema,
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
-import Anthropic from '@anthropic-ai/sdk';
 
 // MCP Server for NeuroCode Adapter
+// LLM calls are delegated to the Client via MCP sampling/createMessage
 class NeuroCodeMCPServer {
   private server: Server;
-  private anthropic: Anthropic;
 
   constructor() {
     this.server = new Server(
@@ -25,23 +24,24 @@ class NeuroCodeMCPServer {
       }
     );
 
-    // Initialize Anthropic client
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      throw new Error('ANTHROPIC_API_KEY environment variable is required');
-    }
-    this.anthropic = new Anthropic({ apiKey });
-
     this.setupHandlers();
   }
 
+  // Send sampling request to the Client, which calls the LLM on our behalf
+  private async callLLM(systemPrompt: string, userPrompt: string, maxTokens = 2048): Promise<string> {
+    const result = await this.server.createMessage({
+      messages: [{ role: 'user', content: { type: 'text', text: userPrompt } }],
+      systemPrompt,
+      maxTokens,
+    });
+    return result.content.type === 'text' ? result.content.text : '';
+  }
+
   private setupHandlers() {
-    // List available tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
       tools: this.getTools(),
     }));
 
-    // Handle tool calls
     this.server.setRequestHandler(CallToolRequestSchema, async (request) =>
       this.handleToolCall(request)
     );
@@ -129,6 +129,25 @@ class NeuroCodeMCPServer {
           required: ['code', 'assignmentId'],
         },
       },
+      {
+        name: 'breakdown_assignment',
+        description: 'Break down a programming assignment into neurodiversity-adaptive sub-tasks',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            assignment: {
+              type: 'object',
+              description: 'The full assignment object (title, description, instructions, metadata, testCases)',
+            },
+            neurodiversityTypes: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'List of neurodiversity types, e.g. ["dyslexia", "adhd", "autism"]',
+            },
+          },
+          required: ['assignment', 'neurodiversityTypes'],
+        },
+      },
     ];
   }
 
@@ -139,31 +158,23 @@ class NeuroCodeMCPServer {
       case 'analyze_context':
         return await this.analyzeContext(args.context);
       case 'get_adaptive_help':
-        return await this.getAdaptiveHelp(
-          args.question,
-          args.context,
-          args.preferences
-        );
+        return await this.getAdaptiveHelp(args.question, args.context, args.preferences);
       case 'generate_adaptations':
-        return await this.generateAdaptations(
-          args.assignmentId,
-          args.userProfile,
-          args.context
-        );
+        return await this.generateAdaptations(args.assignmentId, args.userProfile, args.context);
       case 'evaluate_code':
-        return await this.evaluateCode(
-          args.code,
-          args.assignmentId,
-          args.testCases
-        );
+        return await this.evaluateCode(args.code, args.assignmentId, args.testCases);
+      case 'breakdown_assignment':
+        return await this.breakdownAssignment(args.assignment, args.neurodiversityTypes);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
   }
 
   private async analyzeContext(context: any) {
-    const prompt = `You are an adaptive learning assistant for programming education. 
-Analyze the following coding context and provide insights:
+    const systemPrompt = `You are an adaptive learning assistant for programming education.
+Analyze the coding context provided and respond as JSON with fields: content, suggestions, adaptations, confidence`;
+
+    const userPrompt = `Analyze the following coding context:
 
 Current File: ${context.currentFile}
 Cursor Position: Line ${context.cursorPosition.line}, Column ${context.cursorPosition.character}
@@ -184,48 +195,21 @@ Provide:
 1. A brief analysis of what the student might be working on
 2. Any potential issues or areas of confusion
 3. Suggested adaptations to the learning interface
-4. Confidence level (0-1)
+4. Confidence level (0-1)`;
 
-Format your response as JSON with fields: content, suggestions, adaptations, confidence`;
-
-    const message = await this.anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: prompt }],
-    });
-
-    const responseText = message.content[0].type === 'text' 
-      ? message.content[0].text 
-      : '';
-
-    try {
-      return { content: [{ type: 'text', text: responseText }] };
-    } catch (error) {
-      return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            content: responseText,
-            suggestions: [],
-            adaptations: {},
-            confidence: 0.5,
-          }),
-        }],
-      };
-    }
+    const responseText = await this.callLLM(systemPrompt, userPrompt, 1024);
+    return { content: [{ type: 'text', text: responseText }] };
   }
 
-  private async getAdaptiveHelp(
-    question: string,
-    context: any,
-    preferences: any
-  ) {
-    const prompt = `You are an adaptive programming tutor. A student needs help with:
+  private async getAdaptiveHelp(question: string, context: any, preferences: any) {
+    const systemPrompt = `You are an adaptive programming tutor. Provide help adapted to the student's learning style and needs. Be clear, structured, actionable, and encouraging.`;
+
+    const userPrompt = `A student needs help with:
 
 Question: ${question}
 
 Context:
-- Current Code: 
+- Current Code:
 \`\`\`
 ${context.surroundingCode}
 \`\`\`
@@ -236,43 +220,21 @@ Student Profile:
 - Accessibility Needs: ${preferences.learningProfile?.accessibilityNeeds || 'Not specified'}
 - Previous Experience: ${preferences.learningProfile?.previousExperience || 'Beginner'}
 
-Provide help that is:
-1. Adapted to the student's learning style and needs
-2. Clear and structured (use simple language if preferred)
-3. Actionable with specific next steps
-4. Encouraging and supportive
-
 Format: Plain text with clear sections. Use bullet points sparingly.`;
 
-    const message = await this.anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2048,
-      messages: [{ role: 'user', content: prompt }],
-    });
-
-    const responseText = message.content[0].type === 'text' 
-      ? message.content[0].text 
-      : '';
-
+    const responseText = await this.callLLM(systemPrompt, userPrompt, 2048);
     return {
       content: [{
         type: 'text',
-        text: JSON.stringify({
-          content: responseText,
-          suggestions: [],
-          adaptations: {},
-          confidence: 0.8,
-        }),
+        text: JSON.stringify({ content: responseText, suggestions: [], adaptations: {}, confidence: 0.8 }),
       }],
     };
   }
 
-  private async generateAdaptations(
-    assignmentId: string,
-    userProfile: any,
-    context?: any
-  ) {
-    const prompt = `Generate adaptive presentation configurations for a programming assignment.
+  private async generateAdaptations(assignmentId: string, userProfile: any, _context?: any) {
+    const systemPrompt = `You are an expert in adaptive learning design. Generate UI/UX adaptation configurations as JSON with three categories: visual, structural, interaction.`;
+
+    const userPrompt = `Generate adaptive presentation configurations for assignment: ${assignmentId}
 
 User Profile:
 - Neurodiversity: ${userProfile.learningProfile?.neurodiversityType || 'Not specified'}
@@ -287,29 +249,16 @@ Current Preferences:
 Provide recommendations for:
 1. Visual adaptations (colors, fonts, spacing)
 2. Structural adaptations (chunking, disclosure)
-3. Interaction adaptations (hints, focus mode)
+3. Interaction adaptations (hints, focus mode)`;
 
-Format as JSON with these three categories.`;
-
-    const message = await this.anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: prompt }],
-    });
-
-    const responseText = message.content[0].type === 'text' 
-      ? message.content[0].text 
-      : '';
-
+    const responseText = await this.callLLM(systemPrompt, userPrompt, 1024);
     return { content: [{ type: 'text', text: responseText }] };
   }
 
-  private async evaluateCode(
-    code: string,
-    assignmentId: string,
-    testCases?: any[]
-  ) {
-    const prompt = `Evaluate the following student code for assignment ${assignmentId}:
+  private async evaluateCode(code: string, assignmentId: string, testCases?: any[]) {
+    const systemPrompt = `You are a supportive programming educator. Evaluate student code with constructive, encouraging feedback.`;
+
+    const userPrompt = `Evaluate the following student code for assignment ${assignmentId}:
 
 \`\`\`
 ${code}
@@ -322,20 +271,91 @@ Provide:
 2. Code quality assessment
 3. Constructive feedback adapted for learning
 4. Suggestions for improvement
-5. Encouragement and next steps
+5. Encouragement and next steps`;
 
-Be supportive and educational in your feedback.`;
+    const responseText = await this.callLLM(systemPrompt, userPrompt, 2048);
+    return { content: [{ type: 'text', text: responseText }] };
+  }
 
-    const message = await this.anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2048,
-      messages: [{ role: 'user', content: prompt }],
-    });
+  private async breakdownAssignment(assignment: any, neurodiversityTypes: string[]) {
+    const typeInstructions: Record<string, string> = {
+      dyslexia: `
+- Break content into very small, focused steps (one idea per step).
+- Use simple, short sentences. Avoid long paragraphs.
+- Each step title should be 3-6 words.
+- Provide a brief 1-2 sentence description per step.
+- Include a concrete "what does success look like?" checkpoint.
+- Estimated time per step: 5-15 minutes.`,
+      adhd: `
+- Create micro-tasks that each take 5-10 minutes MAX.
+- Start with the most immediately rewarding or concrete task.
+- Each step must have a clear, unambiguous done condition.
+- Keep descriptions to 2-3 sentences. No walls of text.
+- Include an energizing hint (e.g., "Quick win:", "Just do this one thing:").
+- Estimated time per step: 5-10 minutes.`,
+      autism: `
+- Be completely explicit — no implied steps or assumed knowledge.
+- Use consistent, predictable structure across all steps.
+- Mention ALL edge cases and expected behaviors upfront.
+- Number every sub-action within a step.
+- Avoid vague language like "implement", "handle", "deal with" — always say exactly what to do.
+- Estimated time per step: 10-20 minutes.`,
+    };
 
-    const responseText = message.content[0].type === 'text' 
-      ? message.content[0].text 
-      : '';
+    const relevantInstructions = neurodiversityTypes
+      .map((t) => typeInstructions[t.toLowerCase()])
+      .filter(Boolean)
+      .join('\n');
 
+    const systemPrompt = `You are an expert educational assistant specializing in neurodiversity-adaptive learning.
+Your task is to break down a programming assignment into a series of sequential sub-tasks
+tailored to the learner's neurodiversity profile.
+
+${relevantInstructions || 'Break the assignment into clear, manageable sequential steps of 10-15 minutes each.'}
+
+You MUST respond with valid JSON only — no markdown, no explanation, just raw JSON.
+The JSON must match this exact structure:
+{
+  "overview": "A 1-2 sentence summary of the full assignment in simple terms.",
+  "subTasks": [
+    {
+      "order": 1,
+      "title": "Short step title",
+      "description": "What to do in this step.",
+      "estimatedMinutes": 10,
+      "hints": ["Hint 1", "Hint 2"]
+    }
+  ]
+}`;
+
+    const profileLabel = neurodiversityTypes.length > 0
+      ? neurodiversityTypes.join(', ')
+      : 'general learner';
+
+    const visibleTests = (assignment.testCases ?? [])
+      .filter((tc: any) => !tc.hidden)
+      .map((tc: any) => `- ${tc.description}: input=${JSON.stringify(tc.input)}, expected=${JSON.stringify(tc.expectedOutput)}`)
+      .join('\n');
+
+    const userPrompt = `Please break down this assignment for a learner with profile: ${profileLabel}.
+
+ASSIGNMENT TITLE: ${assignment.title}
+
+DESCRIPTION:
+${assignment.description}
+
+INSTRUCTIONS:
+${assignment.instructions}
+
+DIFFICULTY: ${assignment.metadata?.difficulty ?? 'intermediate'}
+ESTIMATED TIME: ${assignment.metadata?.estimatedTime ?? 60} minutes
+LANGUAGE: ${assignment.metadata?.language ?? 'unknown'}
+${visibleTests ? `\nTEST CASES:\n${visibleTests}` : ''}
+
+Break this into sequential sub-tasks. Each sub-task should be self-contained and completable independently.
+Respond with valid JSON only.`;
+
+    const responseText = await this.callLLM(systemPrompt, userPrompt, 4096);
     return { content: [{ type: 'text', text: responseText }] };
   }
 

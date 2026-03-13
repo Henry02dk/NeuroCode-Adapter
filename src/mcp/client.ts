@@ -1,5 +1,8 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { CreateMessageRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import Anthropic from '@anthropic-ai/sdk';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { ContextAnalysis, MCPRequest, MCPResponse, AIResponse } from '../types';
 
@@ -8,25 +11,29 @@ export class MCPClient {
   private transport: StdioClientTransport | null = null;
   private connected: boolean = false;
   private outputChannel: vscode.OutputChannel;
+  private extensionPath: string;
+  private anthropic: Anthropic;
 
-  constructor() {
+  constructor(extensionPath: string, apiKey: string) {
+    this.extensionPath = extensionPath;
+    this.anthropic = new Anthropic({ apiKey });
     this.outputChannel = vscode.window.createOutputChannel('NeuroCode MCP');
   }
 
   async connect(): Promise<boolean> {
     try {
-      const config = vscode.workspace.getConfiguration('neurocode');
-      const serverCommand = config.get<string>('mcpServerCommand', 'neurocode-mcp-server');
-      
-      this.outputChannel.appendLine(`Connecting to MCP server: ${serverCommand}`);
+      const serverPath = path.join(this.extensionPath, 'dist', 'mcp', 'server.js');
+      this.outputChannel.appendLine(`Spawning MCP server: node ${serverPath}`);
 
-      // Create transport
+      // Create transport — StdioClientTransport spawns the process automatically
       this.transport = new StdioClientTransport({
-        command: serverCommand,
-        args: [],
-        env: Object.fromEntries(
-          Object.entries(process.env).filter(([, v]) => v !== undefined)
-        ) as Record<string, string>
+        command: process.execPath,
+        args: [serverPath],
+        env: {
+          ...Object.fromEntries(
+            Object.entries(process.env).filter(([, v]) => v !== undefined)
+          ) as Record<string, string>,
+        },
       });
 
       // Create client
@@ -42,10 +49,38 @@ export class MCPClient {
         }
       });
 
-      // Connect
+      // Register sampling handler BEFORE connecting.
+      // When the Server calls this.server.createMessage(), the MCP SDK routes
+      // the sampling/createMessage request back here, and we call the LLM.
+      this.client.setRequestHandler(CreateMessageRequestSchema, async (request) => {
+        const { messages, systemPrompt, maxTokens } = request.params;
+
+        this.outputChannel.appendLine('Sampling request received from MCP server — calling Claude');
+
+        const response = await this.anthropic.messages.create({
+          model: 'claude-sonnet-4-6',
+          max_tokens: maxTokens ?? 4096,
+          system: systemPrompt,
+          messages: messages.map((m: any) => ({
+            role: m.role,
+            content: m.content.type === 'text' ? m.content.text : '',
+          })),
+        });
+
+        const text = response.content[0]?.type === 'text' ? response.content[0].text : '';
+
+        return {
+          role: 'assistant' as const,
+          content: { type: 'text' as const, text },
+          model: response.model,
+          stopReason: response.stop_reason === 'end_turn' ? 'endTurn' : (response.stop_reason ?? 'endTurn'),
+        };
+      });
+
+      // Connect — this spawns the server subprocess
       await this.client.connect(this.transport);
       this.connected = true;
-      
+
       this.outputChannel.appendLine('MCP client connected successfully');
       return true;
     } catch (error) {
@@ -80,9 +115,7 @@ export class MCPClient {
     try {
       const response = await this.sendRequest({
         method: 'analyze_context',
-        params: {
-          context: context
-        }
+        params: { context }
       });
 
       if (!response.success) {
@@ -108,11 +141,7 @@ export class MCPClient {
     try {
       const response = await this.sendRequest({
         method: 'get_adaptive_help',
-        params: {
-          question,
-          context,
-          preferences: userPreferences
-        }
+        params: { question, context, preferences: userPreferences }
       });
 
       if (!response.success) {
@@ -138,11 +167,7 @@ export class MCPClient {
     try {
       const response = await this.sendRequest({
         method: 'generate_adaptations',
-        params: {
-          assignmentId,
-          userProfile,
-          context: currentContext
-        }
+        params: { assignmentId, userProfile, context: currentContext }
       });
 
       if (!response.success) {
@@ -168,11 +193,7 @@ export class MCPClient {
     try {
       const response = await this.sendRequest({
         method: 'evaluate_code',
-        params: {
-          code,
-          assignmentId,
-          testCases
-        }
+        params: { code, assignmentId, testCases }
       });
 
       if (!response.success) {
@@ -186,6 +207,29 @@ export class MCPClient {
     }
   }
 
+  async breakdownAssignment(
+    assignment: any,
+    neurodiversityTypes: string[]
+  ): Promise<{ overview: string; subTasks: any[] }> {
+    if (!this.isConnected()) {
+      throw new Error('MCP client not connected');
+    }
+
+    try {
+      const result = await this.client!.callTool({
+        name: 'breakdown_assignment',
+        arguments: { assignment, neurodiversityTypes },
+      });
+
+      const text = (result.content as any[])[0]?.text ?? '{}';
+      const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+      return JSON.parse(cleaned);
+    } catch (error) {
+      this.outputChannel.appendLine(`Breakdown assignment failed: ${error}`);
+      throw error;
+    }
+  }
+
   async sendRequest(request: MCPRequest): Promise<MCPResponse> {
     if (!this.client) {
       throw new Error('MCP client not initialized');
@@ -193,7 +237,7 @@ export class MCPClient {
 
     try {
       this.outputChannel.appendLine(`Sending request: ${request.method}`);
-      
+
       const result = await this.client.request(
         {
           method: request.method,
@@ -204,7 +248,7 @@ export class MCPClient {
       );
 
       this.outputChannel.appendLine(`Received response for: ${request.method}`);
-      
+
       return {
         success: true,
         data: result

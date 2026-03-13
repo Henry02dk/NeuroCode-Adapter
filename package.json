@@ -39,6 +39,10 @@
       {
         "command": "neurocode.getAIHelp",
         "title": "NeuroCode: Get AI Help"
+      },
+      {
+        "command": "neurocode.breakdownAssignment",
+        "title": "NeuroCode: Breakdown Assignment"
       }
     ],
     "configuration": {
@@ -112,6 +116,11 @@
           "type": "string",
           "default": "http://localhost:3000",
           "description": "MCP server URL"
+        },
+        "neurocode.anthropicApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Anthropic API Key for Claude AI features (sk-ant-...)"
         }
       }
     },

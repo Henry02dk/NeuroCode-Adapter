@@ -4,23 +4,27 @@ import { ContextAnalyzer } from './context/analyzer';
 import { PreferencesManager } from './preferences/manager';
 import { AssignmentManager } from './assignments/manager';
 import { AdaptiveRenderer } from './adaptive/renderer';
+import { AssignmentBreakdownService } from './breakdown/service';
 
 let mcpClient: MCPClient;
 let contextAnalyzer: ContextAnalyzer;
 let preferencesManager: PreferencesManager;
 let assignmentManager: AssignmentManager;
 let adaptiveRenderer: AdaptiveRenderer;
+let breakdownService: AssignmentBreakdownService;
 let statusBarItem: vscode.StatusBarItem;
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log('NeuroCode Adapter is now active!');
 
   // Initialize managers
-  mcpClient = new MCPClient();
+  const apiKey = vscode.workspace.getConfiguration('neurocode').get<string>('anthropicApiKey', '');
+  mcpClient = new MCPClient(context.extensionPath, apiKey);
   contextAnalyzer = new ContextAnalyzer();
   preferencesManager = new PreferencesManager(context);
   assignmentManager = new AssignmentManager(context);
   adaptiveRenderer = new AdaptiveRenderer(preferencesManager.getPreferences());
+  breakdownService = new AssignmentBreakdownService(mcpClient);
 
   // Create status bar item
   statusBarItem = vscode.window.createStatusBarItem(
@@ -187,6 +191,62 @@ function registerCommands(context: vscode.ExtensionContext) {
       } catch (error) {
         vscode.window.showErrorMessage(`Failed to export progress: ${error}`);
       }
+    })
+  );
+
+  // Breakdown Assignment
+  context.subscriptions.push(
+    vscode.commands.registerCommand('neurocode.breakdownAssignment', async () => {
+      if (!mcpClient.isConnected()) {
+        vscode.window.showErrorMessage(
+          'NeuroCode MCP server is not running. Start it first via Tasks: Start MCP Server.'
+        );
+        return;
+      }
+
+      const assignments = assignmentManager.getAllAssignments();
+
+      if (assignments.length === 0) {
+        vscode.window.showWarningMessage('No assignments available. Import one first.');
+        return;
+      }
+
+      const items = assignments.map((a) => ({
+        label: a.title,
+        description: a.metadata.difficulty,
+        assignment: a,
+      }));
+
+      const selected = await vscode.window.showQuickPick(items, {
+        placeHolder: 'Select an assignment to break down',
+      });
+
+      if (!selected) {
+        return;
+      }
+
+      const preferences = preferencesManager.getPreferences();
+      const profileTypes = preferences.learningProfile?.neurodiversityType ?? [];
+      const profileLabel = profileTypes.length > 0 ? profileTypes.join(', ') : 'general';
+
+      await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: `Breaking down assignment for profile: ${profileLabel}...`,
+          cancellable: false,
+        },
+        async () => {
+          try {
+            const breakdown = await breakdownService.breakdown(
+              selected.assignment,
+              preferences
+            );
+            await adaptiveRenderer.renderBreakdown(breakdown);
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to break down assignment: ${error}`);
+          }
+        }
+      );
     })
   );
 

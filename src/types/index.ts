@@ -127,12 +127,30 @@ export interface Assignment {
     error?: string;
   }
   
+  export interface SubTask {
+    id: string;
+    title: string;
+    description: string;
+    estimatedMinutes: number;
+    hints: string[];
+    order: number;
+  }
+
+  export interface AssignmentBreakdown {
+    assignmentId: string;
+    neurodiversityTypes: string[];
+    overview: string;
+    subTasks: SubTask[];
+    totalEstimatedMinutes: number;
+    createdAt: Date;
+  }
+
   export interface MCPRequest {
     method: string;
     params: any;
     context?: ContextAnalysis;
   }
-  
+
   export interface MCPResponse {
     success: boolean;
     data?: any;

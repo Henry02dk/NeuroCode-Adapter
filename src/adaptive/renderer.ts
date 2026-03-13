@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { marked } from 'marked';
-import { Assignment, UserPreferences, AdaptationConfig } from '../types';
+import { Assignment, UserPreferences, AdaptationConfig, AssignmentBreakdown } from '../types';
 
 export class AdaptiveRenderer {
   private preferences: UserPreferences;
@@ -11,6 +11,219 @@ export class AdaptiveRenderer {
 
   updatePreferences(preferences: UserPreferences) {
     this.preferences = preferences;
+  }
+
+  async renderBreakdown(breakdown: AssignmentBreakdown): Promise<void> {
+    const panel = vscode.window.createWebviewPanel(
+      'neurocodeBreakdown',
+      `Breakdown: ${breakdown.subTasks.length} steps`,
+      vscode.ViewColumn.Two,
+      { enableScripts: true, retainContextWhenHidden: true }
+    );
+    panel.webview.html = this.generateBreakdownHTML(breakdown);
+  }
+
+  private generateBreakdownHTML(breakdown: AssignmentBreakdown): string {
+    const visual = this.preferences.visualPreferences;
+    const customCSS = this.generateCustomCSS(visual);
+    const profileLabel = breakdown.neurodiversityTypes.length > 0
+      ? breakdown.neurodiversityTypes.join(', ')
+      : 'General';
+
+    const profileBadgeColor: Record<string, string> = {
+      dyslexia: '#6a8fd8',
+      adhd: '#e87d2b',
+      autism: '#5aab6f',
+    };
+
+    const profileColors = breakdown.neurodiversityTypes
+      .map((t) => profileBadgeColor[t.toLowerCase()])
+      .filter(Boolean);
+    const accentColor = profileColors[0] ?? '#6a8fd8';
+
+    const stepsHTML = breakdown.subTasks.map((task) => {
+      const hintsHTML = task.hints.length > 0
+        ? `<div class="hints">
+            <span class="hints-label">Hints</span>
+            <ul>${task.hints.map((h) => `<li>${h}</li>`).join('')}</ul>
+           </div>`
+        : '';
+
+      return `
+      <div class="step" id="step-${task.order}">
+        <div class="step-header">
+          <span class="step-number">${task.order}</span>
+          <h3 class="step-title">${task.title}</h3>
+          <span class="step-time">~${task.estimatedMinutes} min</span>
+        </div>
+        <div class="step-body">
+          <p class="step-description">${task.description}</p>
+          ${hintsHTML}
+        </div>
+        <div class="step-footer">
+          <label class="done-label">
+            <input type="checkbox" onchange="markDone(${task.order}, this.checked)">
+            Done
+          </label>
+        </div>
+      </div>`;
+    }).join('\n');
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assignment Breakdown</title>
+  <style>
+    ${this.getBaseCSS()}
+    ${customCSS}
+
+    :root { --accent: ${accentColor}; }
+
+    .breakdown-header {
+      padding: 20px;
+      border-bottom: 2px solid var(--accent);
+      margin-bottom: 24px;
+    }
+    .breakdown-header h1 { font-size: 1.4em; margin-bottom: 8px; }
+    .profile-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 12px;
+      padding: 3px 12px;
+      font-size: 0.8em;
+      margin-right: 8px;
+    }
+    .total-time {
+      font-size: 0.9em;
+      opacity: 0.75;
+      margin-top: 6px;
+    }
+    .overview {
+      background: var(--vscode-textBlockQuote-background);
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+      font-size: 0.95em;
+    }
+    .progress-bar-wrap {
+      background: var(--vscode-panel-border);
+      border-radius: 6px;
+      height: 8px;
+      margin: 10px 0 20px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 8px;
+      background: var(--accent);
+      border-radius: 6px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+    .step {
+      border: 1px solid var(--vscode-panel-border);
+      border-radius: 6px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .step.done {
+      border-color: var(--accent);
+      opacity: 0.65;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--vscode-editor-background);
+      border-bottom: 1px solid var(--vscode-panel-border);
+    }
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.85em;
+      flex-shrink: 0;
+    }
+    .step-title { flex: 1; margin: 0; font-size: 1em; }
+    .step-time {
+      font-size: 0.8em;
+      opacity: 0.7;
+      white-space: nowrap;
+    }
+    .step-body { padding: 14px 16px; }
+    .step-description { margin: 0 0 10px; line-height: 1.6; }
+    .hints { margin-top: 10px; }
+    .hints-label {
+      font-size: 0.8em;
+      font-weight: bold;
+      text-transform: uppercase;
+      opacity: 0.6;
+      letter-spacing: 0.05em;
+    }
+    .hints ul { margin: 6px 0 0 16px; padding: 0; }
+    .hints li { margin-bottom: 4px; font-size: 0.9em; }
+    .step-footer {
+      padding: 8px 16px;
+      border-top: 1px solid var(--vscode-panel-border);
+    }
+    .done-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    .done-label input { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breakdown-header">
+      <h1>Assignment Breakdown</h1>
+      <span class="profile-badge">${profileLabel}</span>
+      <div class="total-time">Total estimated time: ${breakdown.totalEstimatedMinutes} min &nbsp;|&nbsp; ${breakdown.subTasks.length} steps</div>
+    </div>
+
+    <div class="overview">${breakdown.overview}</div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div id="steps">
+      ${stepsHTML}
+    </div>
+  </div>
+
+  <script>
+    const total = ${breakdown.subTasks.length};
+    let completed = 0;
+
+    function markDone(order, isDone) {
+      const step = document.getElementById('step-' + order);
+      if (isDone) {
+        step.classList.add('done');
+        completed++;
+      } else {
+        step.classList.remove('done');
+        completed--;
+      }
+      document.getElementById('progress-bar').style.width = (completed / total * 100) + '%';
+    }
+  </script>
+</body>
+</html>`;
   }
 
   async renderAssignment(assignment: Assignment): Promise<void> {
