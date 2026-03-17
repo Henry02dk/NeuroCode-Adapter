@@ -43,6 +43,10 @@
       {
         "command": "neurocode.breakdownAssignment",
         "title": "NeuroCode: Breakdown Assignment"
+      },
+      {
+        "command": "neurocode.setNeurodiversityProfile",
+        "title": "NeuroCode: Set Neurodiversity Profile"
       }
     ],
     "configuration": {

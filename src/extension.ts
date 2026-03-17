@@ -139,6 +139,46 @@ function registerCommands(context: vscode.ExtensionContext) {
     })
   );
 
+  // Set Neurodiversity Profile
+  context.subscriptions.push(
+    vscode.commands.registerCommand('neurocode.setNeurodiversityProfile', async () => {
+      const prefs = preferencesManager.getPreferences();
+      const current = prefs.learningProfile?.neurodiversityType ?? [];
+
+      const items = [
+        { label: 'ADHD', description: '注意力缺陷多动障碍', picked: current.includes('adhd') },
+        { label: 'Dyslexia', description: '阅读障碍', picked: current.includes('dyslexia') },
+        { label: 'Autism', description: '自闭症谱系障碍', picked: current.includes('autism') },
+      ];
+
+      const selected = await vscode.window.showQuickPick(items, {
+        canPickMany: true,
+        placeHolder: '选择你的神经多样性类型（可多选，留空表示无特殊需求）',
+      });
+
+      if (selected === undefined) {
+        return; // user cancelled
+      }
+
+      const neurodiversityTypes = selected.map(item => item.label.toLowerCase());
+
+      await preferencesManager.updatePreferences({
+        learningProfile: {
+          ...prefs.learningProfile,
+          neurodiversityType: neurodiversityTypes,
+          preferredLearningStyle: prefs.learningProfile?.preferredLearningStyle ?? [],
+          accessibilityNeeds: prefs.learningProfile?.accessibilityNeeds ?? [],
+          previousExperience: prefs.learningProfile?.previousExperience ?? 'beginner',
+        },
+      });
+
+      const label = neurodiversityTypes.length > 0
+        ? neurodiversityTypes.join(', ')
+        : '无特殊需求';
+      vscode.window.showInformationMessage(`神经多样性类型已更新：${label}`);
+    })
+  );
+
   // Toggle Adaptive Mode
   context.subscriptions.push(
     vscode.commands.registerCommand('neurocode.toggleAdaptiveMode', async () => {
