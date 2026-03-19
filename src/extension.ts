@@ -15,6 +15,7 @@ let breakdownService: AssignmentBreakdownService;
 let statusBarItem: vscode.StatusBarItem;
 
 export async function activate(context: vscode.ExtensionContext) {
+  vscode.window.showInformationMessage('NeuroCode activate called');
   console.log('NeuroCode Adapter is now active!');
 
   // Initialize managers
@@ -37,6 +38,9 @@ export async function activate(context: vscode.ExtensionContext) {
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
 
+  // Register commands
+  registerCommands(context);
+
   // Connect to MCP server
   const connected = await mcpClient.connect();
   if (connected) {
@@ -49,8 +53,6 @@ export async function activate(context: vscode.ExtensionContext) {
     statusBarItem.text = '$(book) NeuroCode ⚠';
   }
 
-  // Register commands
-  registerCommands(context);
 
   // Setup activity monitoring
   setupActivityMonitoring(context);
@@ -110,7 +112,7 @@ function registerCommands(context: vscode.ExtensionContext) {
         canSelectFolders: false,
         canSelectMany: false,
         filters: {
-          'Assignment Files': ['json'],
+          'Assignment Files': ['json', 'pdf'],
         },
         title: 'Select Assignment File',
       });

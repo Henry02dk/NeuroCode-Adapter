@@ -9,8 +9,40 @@ export interface Assignment {
     testCases?: TestCase[];
     metadata: AssignmentMetadata;
     adaptations?: AdaptationConfig;
+
+    // 新增：课程信息
+    courseName?: string;
+    instructors?: string[];
+    // 新增：按 PDF 结构解析后的章节
+    sections?: AssignmentSection[];
+    // 新增：每个大题转成子任务，方便后续 breakdown / adaptive rendering
+    subTasks?: SubTask[];
+    // 新增：保留原始导入文本，方便调试和 AI 二次处理
+    sourceText?: string;
   }
   
+  // 新增：一个大题 section
+export interface AssignmentSection {
+  order: number;
+  title: string;
+  items: AssignmentItem[];
+}
+
+// 新增：section 下面的 1. 2. 3. 小题
+export interface AssignmentItem {
+  order: number;
+  content: string;
+}
+
+export interface SubTask {
+  id: string;
+  title: string;
+  description: string;
+  estimatedMinutes: number;
+  hints: string[];
+  order: number;
+}
+
   export interface AssignmentMetadata {
     author: string;
     created: Date;
