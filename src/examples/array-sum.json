@@ -1,0 +1,75 @@
+{
+    "id": "example_array_sum",
+    "title": "Array Sum Calculator",
+    "description": "Learn how to calculate the sum of numbers in an array using loops and array methods.",
+    "instructions": "Write a function called `calculateSum` that takes an array of numbers as input and returns the sum of all numbers in the array.\n\n## Requirements\n\n1. The function should accept an array of numbers\n2. Return the sum of all numbers\n3. Handle empty arrays (return 0)\n4. Use a loop or array method\n\n## Example\n\n```javascript\ncalculateSum([1, 2, 3, 4, 5]); // returns 15\ncalculateSum([10, -5, 3]); // returns 8\ncalculateSum([]); // returns 0\n```",
+    "starterCode": "function calculateSum(numbers) {\n  // Your code here\n  \n}\n\n// Test your function\nconsole.log(calculateSum([1, 2, 3, 4, 5]));\nconsole.log(calculateSum([10, -5, 3]));\nconsole.log(calculateSum([]));\n",
+    "testCases": [
+      {
+        "id": "test1",
+        "description": "Sum of positive numbers",
+        "input": [1, 2, 3, 4, 5],
+        "expectedOutput": 15,
+        "hidden": false
+      },
+      {
+        "id": "test2",
+        "description": "Sum with negative numbers",
+        "input": [10, -5, 3],
+        "expectedOutput": 8,
+        "hidden": false
+      },
+      {
+        "id": "test3",
+        "description": "Empty array",
+        "input": [],
+        "expectedOutput": 0,
+        "hidden": false
+      },
+      {
+        "id": "test4",
+        "description": "Single element",
+        "input": [42],
+        "expectedOutput": 42,
+        "hidden": false
+      },
+      {
+        "id": "test5",
+        "description": "Large array",
+        "input": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "expectedOutput": 55,
+        "hidden": true
+      }
+    ],
+    "metadata": {
+      "author": "NeuroCode Team",
+      "created": "2024-01-01T00:00:00Z",
+      "updated": "2024-01-01T00:00:00Z",
+      "difficulty": "beginner",
+      "topics": ["arrays", "loops", "functions"],
+      "estimatedTime": 20,
+      "language": "javascript"
+    },
+    "adaptations": {
+      "visualAdaptations": {
+        "colorScheme": "default",
+        "fontSize": "medium",
+        "fontFamily": "default",
+        "lineSpacing": 1.5,
+        "highlightEnabled": true,
+        "animationsReduced": false
+      },
+      "structuralAdaptations": {
+        "chunking": true,
+        "progressiveDisclosure": true,
+        "summaryFirst": true,
+        "visualHierarchy": "moderate"
+      },
+      "interactionAdaptations": {
+        "textToSpeech": false,
+        "focusMode": false,
+        "autoSave": true,
+        "hintAvailability": "delayed"
+      }
+    }
+  }
