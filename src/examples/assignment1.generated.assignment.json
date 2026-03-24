@@ -1,0 +1,184 @@
+{
+  "id": "assignment_1774379333204_8y6q1bl25",
+  "title": "Assignment 1: Linear Algebra, Differential Calculus",
+  "description": "Calculus\nVision and Image Processing\nSerge Belongie, Hang Yin\nThis is the first mandatory assignment on the course Vision and Image Process-\ning. The goal for you is to get familiar with vector and matrix operations as\nwell as some computations of derivatives and gradients.\nThis assignment must be solved individually. You have to pass this\nand the following mandatory assignments and quizzes in order to pass this\ncourse. If you do not pass the assignment, but you have made a SERIOUS\nattempt, you ",
+  "instructions": "Calculus\nVision and Image Processing\nSerge Belongie, Hang Yin\nThis is the first mandatory assignment on the course Vision and Image Process-\ning. The goal for you is to get familiar with vector and matrix operations as\nwell as some computations of derivatives and gradients.\nThis assignment must be solved individually. You have to pass this\nand the following mandatory assignments and quizzes in order to pass this\ncourse. If you do not pass the assignment, but you have made a SERIOUS\nattempt, you will get a second chance of submitting a new solution.\nThe deadline for this assignment is Monday 25/11, 2024 at 22:00.\nYou must submit your solution electronically via the Absalon homepage. Go to\nthe assignments list and choose this assignment and upload your solution prior\nto the deadline. Remember to include your name and KU user name (login for\nKUnet) in the solution.",
+  "starterCode": "",
+  "testCases": [],
+  "metadata": {
+    "author": "Serge Belongie, Hang Yin",
+    "created": "2026-03-24T19:08:53.204Z",
+    "updated": "2026-03-24T19:08:53.204Z",
+    "difficulty": "intermediate",
+    "topics": [
+      "array",
+      "graph"
+    ],
+    "estimatedTime": 150,
+    "language": "python"
+  },
+  "courseName": "",
+  "instructors": [
+    "Serge Belongie",
+    "Hang Yin"
+  ],
+  "sections": [
+    {
+      "order": 1,
+      "title": "Vector Matrix Calculations, pen and paper",
+      "items": [
+        {
+          "order": 1,
+          "content": "1. Letvbe the vector [−2,b,7,2,a]\nT\n. Computev\nT\nvandvv\nT\n."
+        },
+        {
+          "order": 2,
+          "content": "2. LetAandBthe following matrices\nA=\n\n\n−54−6\n34−6\n8−68\n\n\n, B=\n\n\n−48\n−5−9\n4−7\n\n\nComputev=B.[x,y]\nT\n,w=A.v. Then computeC=A.Bandz=\nC.[x,y]\nT\n."
+        },
+        {
+          "order": 3,
+          "content": "3. LetAbe the matrix:\nA=\n\n\n1−1−1\n8−x x−6x−6\nx−7 5−x5−x\n\n\nCompute respectivelyA\n2\n=A.AandA\n3\n=A.A.A. Such a matrixAis\ncallednilpotent.\n1"
+        },
+        {
+          "order": 4,
+          "content": "4. LetAbe the matrix\nA=\n\n\n−9572−4\n−144109−6\n76−573\n\n\nLete\n1\n= [1,0,0]\nT\n,e\n2\n= [0,1,0]\nT\nande\n3\n= [0,0,1]\nT\n. Compute respectively\nthe solutionsf\n1\n,f\n2\nandf\n3\nof the linear systems\nA.f\n1\n=e\n1\n, A.f\n2\n=e\n2\n, A.f\n3\n=e\n3\n.\nLetBthe matrix which columns are respectivelyf\n1\n,f\n2\nandf\n3\n. Then\ncomputeA.BandB.A. What does it mean?\n5.[optional]LetAandBbe square matrices of size (n,n). Show that\n(A.B)\nT\n=B\nT\n.A\nT\n."
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Vector Matrix Calculations, Python",
+      "items": [
+        {
+          "order": 1,
+          "content": "1. An inner and an outer product. Compute the inner product of\na = np.array([17,6,-5.5,3])andb = np.array([-4.9,1.17,0,2]).\nUsenp.dot()or, preferably, the infix notation@. Computing the outer\nproduct requires a bit of extra work. Display theshapeofa,b. andb.T\n(b.shapeandb.T.shape). To force Python-numpyto distinguish between\ncolumn and line vectors, 1D arrays can be reshaped: Try this piece of code\ninteractively:\n>> print(a@b)\n>> a.shape = (4,1) # a matrix with 1 column (a column vector)\n>> b.shape = (4,1) # a matrix with 1 column (a column vector)\n>> print(a)\n>> print(b)\n>> print(b.shape)\n>> print(b.T.shape)\n>> print(a@b)\n>> print(a.T@b)\n>> print(float(a.T@b))\n>> print(a@b.T)\nWhat do you get?\n2"
+        },
+        {
+          "order": 2,
+          "content": "2. Lett= [−3,2,11]\nT\n. Compute the cross-productt×toftand itself.\n(numpyhas a cross-product operation, feel free to implement yours). Let\na= [−2,6,1]\nT\n. Computeb=t×aandc=a×t. Then compute the\ninner productst\nT\nbanda\nT\nb.\nTo a 3D vectort, one associates the matrix\nˆ\nt=\n\n\n0−t\n3\nt\n2\nt\n3\n0−t\n1\n−t\n2\nt\n1\n0\n\n"
+        },
+        {
+          "order": 3,
+          "content": "3. Write a function that takes a 3D vectortand associates the corresponding\nmatrix\nˆ\nt. Withtandafrom the previous question, compute\nˆ\ntt(matrix\nvector product) as well as\nˆ\nta. What do you get?"
+        },
+        {
+          "order": 4,
+          "content": "4. For a 3D vectorv, the operationv7→t×vislinear. So it can be\nrepresented by a matrix. Which one?"
+        },
+        {
+          "order": 5,
+          "content": "5. Check that\nˆ\nt\nT\n=−\nˆ\nt. Compute\nˆ\nt\n2\n=\nˆ\nt.\nˆ\nt(matrix-matrix product). What\nis the transpose of\nˆ\nt\n2\n? What about\nˆ\nt\n3\n=\nˆ\nt.\nˆ\nt.\nˆ\nt? You may want first to\nperform numerical computations in Python!"
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Derivatives",
+      "items": [
+        {
+          "order": 1,
+          "content": "1. Compute the derivativef\n′\n(x) off(x) =e\n−\nx\n2\n2\n(hint: use the chain rule for\nthe exponential, see the tables below.)"
+        },
+        {
+          "order": 2,
+          "content": "2. Compute its second derivative,f\n′′\n(x). (hint: reuse the previous rule and\nLeibniz rule)."
+        },
+        {
+          "order": 3,
+          "content": "3. Plot on the same graphf(x),f\n′\n(x) andf\n′′\n(x), say forx∈[−7,7] (easy\nwith Python’smatplotlib)."
+        },
+        {
+          "order": 4,
+          "content": "4. Compute the derivativeg\n′\n(t) ofg(t) = cos(t)/sin(t).\nFunctions of several variables. This exercise uses many of the derivation rules!"
+        },
+        {
+          "order": 5,
+          "content": "5. Letf(x,t) be the Gaussian distribution function of variancet,\nf(x,t) =\n1\n√\n2πt\ne\n−\nx\n2\n2t\n."
+        },
+        {
+          "order": 6,
+          "content": "6. Compute\n∂f\n∂x\n(x,t), the first partial derivative off(x,t) with respect tox\n(remember that you have to assume thattis fixed and you use the rules of\nderivation for a function of one variable). It is also called thex-derivative\noff(x,t)."
+        },
+        {
+          "order": 7,
+          "content": "7. Compute\n∂f\n∂t\n(x,t), thet-derivative off(x,t)."
+        },
+        {
+          "order": 8,
+          "content": "8. Compute\n∂\n2\nf\n∂x\n2\n(x,t), the second partial derivative offwith respect tox,\nthis is thex-derivative of\n∂f\n∂x\n(x,t).\n3"
+        },
+        {
+          "order": 9,
+          "content": "9. Then show that\n∂f\n∂t\n(x,t) =\n1\n2\n∂\n2\nf\n∂x\n2\n(x,t)\nThis is an extremely important property of this function, especially for\nmany computer vision applications, wheretwill play the role of aspatial\nscale parameter."
+        },
+        {
+          "order": 10,
+          "content": "10. Plot these functions fort= 1,2,4, withx∈[−15,15]."
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Some derivation rules and classical derivatives",
+      "items": [
+        {
+          "order": 1,
+          "content": "Standard derivation rules:f(x),g(x) are functions of the real variablex,λis a\nreal number. The first derivative is denoted byf\n′\n(x), the second byf\n′′\n(x) (the\nthird is often denoted by byf\n′′′\n(x) while, in general, for higher order, sayn,\nthen-th derivative is denoted byf\n(n)\n(x)).\nfunctionderivativerule name\nλf(x)λf\n′\n(x)scalar multiplication rule\nf(x) +g(x)f\n′\n(x) +g\n′\n(x)sum rule\nf(x)g(x)f\n′\n(x)g(x) +f(x)g\n′\n(x)Leibniz rule\nf(x)\ng(x)\nf\n′\n(x)g(x)−f(x)g\n′\n(x)\ng(x)\n2\nquotient rule\nf(g(x))f\n′\n(g(x))g\n′\n(x)chain rule\ne\nf(x)\nf\n′\n(x)e\nf(x)\nexponentiation rule (chain rule!)\nln|f(x)|\nf\n′\n(x)\nf(x)\nlogarithm rule\n(f(x)g(x))\n′′\nf\n′′\n(x)g(x) + 2f\n′\n(x)g\n′\n(x) +g\n′′\n(x)iterated Leibniz rule\nSome classical derivatives\nfunctionderivativedomain/remark\nx\nα\nαx\nα−1\nifαis not an integer,xshould be>0\ne\nx\ne\nx\nx∈R\nlnx\n1\nx\nx >0\n√\nx\n1\n2\n√\nx\nspecial case of first rule withα=\n1\n2\n,x >0\ncosx−sinxx∈R\nsinxcosxx∈R\ntanx\n1\ncos\n2\nx\nx̸=k±\nπ\n2\n,k∈Z\narcsinx\n1\n√\n1−x\n2\n−1< x <1\narccosx−\n1\n√\n1−x\n2\n−1< x <1\narctanx\n1\n1+x\n2\nx∈R\n4"
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "title": "A few things about Python and Maltab",
+      "items": [
+        {
+          "order": 1,
+          "content": "In Python withnumpy, thenumpy.dot()function can be use for inner products,\nmatrix vector products, as well as matrix matrix products. From Python 3.6 at\nleast and the correspondingnumpypackage, one can also use theinfixnotation\n@. In Python-numpy, the transpose of a arraymism.T. The submodulelinalg\nofnumpycontains many standard linear algebra operations.\nIn Matlab almost all variables are matrices. Column vectors are matrices\nof size (n,1) while line vectors are matrices of size (n,1). The matrix-matrix\nmultiplication simply uses ”∗”. Transposition is denoted with an apostrophe,\nthe transpose ofmism\n′\n.\nA note on relevant software\nWe recommend that you select python 3.6 or higher as your programming lan-\nguage, preferably from Anaconda, with thenumpyandscipypackages. Matlab,\nC, C++ may be other possibilities. Still we recommend that you select the lan-\nguage you are most confident in. We however assume that you will use Python\nandnumpy. If you still wish to use another programming language, you should\nhave some knowledge about linear algebra libraries for this language. With Mat-\nlab, this is straightforward, the name itself stands for ”MATrix LABoratory”.\nThe focus should be on learning the methods and not learning a new pro-\ngramming language. If you wish to use Matlab, you may download and install\nthis from the “Softwarebiblioteket” available at KUnet.\n5"
+        }
+      ]
+    }
+  ],
+  "subTasks": [
+    {
+      "id": "subtask_1_1774379333204",
+      "title": "Vector Matrix Calculations, pen and paper",
+      "description": "1. Letvbe the vector [−2,b,7,2,a]\nT\n. Computev\nT\nvandvv\nT\n.\n\n2. LetAandBthe following matrices\nA=\n\n\n−54−6\n34−6\n8−68\n\n\n, B=\n\n\n−48\n−5−9\n4−7\n\n\nComputev=B.[x,y]\nT\n,w=A.v. Then computeC=A.Bandz=\nC.[x,y]\nT\n.\n\n3. LetAbe the matrix:\nA=\n\n\n1−1−1\n8−x x−6x−6\nx−7 5−x5−x\n\n\nCompute respectivelyA\n2\n=A.AandA\n3\n=A.A.A. Such a matrixAis\ncallednilpotent.\n1\n\n4. LetAbe the matrix\nA=\n\n\n−9572−4\n−144109−6\n76−573\n\n\nLete\n1\n= [1,0,0]\nT\n,e\n2\n= [0,1,0]\nT\nande\n3\n= [0,0,1]\nT\n. Compute respectively\nthe solutionsf\n1\n,f\n2\nandf\n3\nof the linear systems\nA.f\n1\n=e\n1\n, A.f\n2\n=e\n2\n, A.f\n3\n=e\n3\n.\nLetBthe matrix which columns are respectivelyf\n1\n,f\n2\nandf\n3\n. Then\ncomputeA.BandB.A. What does it mean?\n5.[optional]LetAandBbe square matrices of size (n,n). Show that\n(A.B)\nT\n=B\nT\n.A\nT\n.",
+      "estimatedMinutes": 60,
+      "hints": [],
+      "order": 1
+    },
+    {
+      "id": "subtask_2_1774379333204",
+      "title": "Vector Matrix Calculations, Python",
+      "description": "1. An inner and an outer product. Compute the inner product of\na = np.array([17,6,-5.5,3])andb = np.array([-4.9,1.17,0,2]).\nUsenp.dot()or, preferably, the infix notation@. Computing the outer\nproduct requires a bit of extra work. Display theshapeofa,b. andb.T\n(b.shapeandb.T.shape). To force Python-numpyto distinguish between\ncolumn and line vectors, 1D arrays can be reshaped: Try this piece of code\ninteractively:\n>> print(a@b)\n>> a.shape = (4,1) # a matrix with 1 column (a column vector)\n>> b.shape = (4,1) # a matrix with 1 column (a column vector)\n>> print(a)\n>> print(b)\n>> print(b.shape)\n>> print(b.T.shape)\n>> print(a@b)\n>> print(a.T@b)\n>> print(float(a.T@b))\n>> print(a@b.T)\nWhat do you get?\n2\n\n2. Lett= [−3,2,11]\nT\n. Compute the cross-productt×toftand itself.\n(numpyhas a cross-product operation, feel free to implement yours). Let\na= [−2,6,1]\nT\n. Computeb=t×aandc=a×t. Then compute the\ninner productst\nT\nbanda\nT\nb.\nTo a 3D vectort, one associates the matrix\nˆ\nt=\n\n\n0−t\n3\nt\n2\nt\n3\n0−t\n1\n−t\n2\nt\n1\n0\n\n\n\n3. Write a function that takes a 3D vectortand associates the corresponding\nmatrix\nˆ\nt. Withtandafrom the previous question, compute\nˆ\ntt(matrix\nvector product) as well as\nˆ\nta. What do you get?\n\n4. For a 3D vectorv, the operationv7→t×vislinear. So it can be\nrepresented by a matrix. Which one?\n\n5. Check that\nˆ\nt\nT\n=−\nˆ\nt. Compute\nˆ\nt\n2\n=\nˆ\nt.\nˆ\nt(matrix-matrix product). What\nis the transpose of\nˆ\nt\n2\n? What about\nˆ\nt\n3\n=\nˆ\nt.\nˆ\nt.\nˆ\nt? You may want first to\nperform numerical computations in Python!",
+      "estimatedMinutes": 75,
+      "hints": [],
+      "order": 2
+    },
+    {
+      "id": "subtask_3_1774379333204",
+      "title": "Derivatives",
+      "description": "1. Compute the derivativef\n′\n(x) off(x) =e\n−\nx\n2\n2\n(hint: use the chain rule for\nthe exponential, see the tables below.)\n\n2. Compute its second derivative,f\n′′\n(x). (hint: reuse the previous rule and\nLeibniz rule).\n\n3. Plot on the same graphf(x),f\n′\n(x) andf\n′′\n(x), say forx∈[−7,7] (easy\nwith Python’smatplotlib).\n\n4. Compute the derivativeg\n′\n(t) ofg(t) = cos(t)/sin(t).\nFunctions of several variables. This exercise uses many of the derivation rules!\n\n5. Letf(x,t) be the Gaussian distribution function of variancet,\nf(x,t) =\n1\n√\n2πt\ne\n−\nx\n2\n2t\n.\n\n6. Compute\n∂f\n∂x\n(x,t), the first partial derivative off(x,t) with respect tox\n(remember that you have to assume thattis fixed and you use the rules of\nderivation for a function of one variable). It is also called thex-derivative\noff(x,t).\n\n7. Compute\n∂f\n∂t\n(x,t), thet-derivative off(x,t).\n\n8. Compute\n∂\n2\nf\n∂x\n2\n(x,t), the second partial derivative offwith respect tox,\nthis is thex-derivative of\n∂f\n∂x\n(x,t).\n3\n\n9. Then show that\n∂f\n∂t\n(x,t) =\n1\n2\n∂\n2\nf\n∂x\n2\n(x,t)\nThis is an extremely important property of this function, especially for\nmany computer vision applications, wheretwill play the role of aspatial\nscale parameter.\n\n10. Plot these functions fort= 1,2,4, withx∈[−15,15].",
+      "estimatedMinutes": 150,
+      "hints": [],
+      "order": 3
+    },
+    {
+      "id": "subtask_4_1774379333204",
+      "title": "Some derivation rules and classical derivatives",
+      "description": "Standard derivation rules:f(x),g(x) are functions of the real variablex,λis a\nreal number. The first derivative is denoted byf\n′\n(x), the second byf\n′′\n(x) (the\nthird is often denoted by byf\n′′′\n(x) while, in general, for higher order, sayn,\nthen-th derivative is denoted byf\n(n)\n(x)).\nfunctionderivativerule name\nλf(x)λf\n′\n(x)scalar multiplication rule\nf(x) +g(x)f\n′\n(x) +g\n′\n(x)sum rule\nf(x)g(x)f\n′\n(x)g(x) +f(x)g\n′\n(x)Leibniz rule\nf(x)\ng(x)\nf\n′\n(x)g(x)−f(x)g\n′\n(x)\ng(x)\n2\nquotient rule\nf(g(x))f\n′\n(g(x))g\n′\n(x)chain rule\ne\nf(x)\nf\n′\n(x)e\nf(x)\nexponentiation rule (chain rule!)\nln|f(x)|\nf\n′\n(x)\nf(x)\nlogarithm rule\n(f(x)g(x))\n′′\nf\n′′\n(x)g(x) + 2f\n′\n(x)g\n′\n(x) +g\n′′\n(x)iterated Leibniz rule\nSome classical derivatives\nfunctionderivativedomain/remark\nx\nα\nαx\nα−1\nifαis not an integer,xshould be>0\ne\nx\ne\nx\nx∈R\nlnx\n1\nx\nx >0\n√\nx\n1\n2\n√\nx\nspecial case of first rule withα=\n1\n2\n,x >0\ncosx−sinxx∈R\nsinxcosxx∈R\ntanx\n1\ncos\n2\nx\nx̸=k±\nπ\n2\n,k∈Z\narcsinx\n1\n√\n1−x\n2\n−1< x <1\narccosx−\n1\n√\n1−x\n2\n−1< x <1\narctanx\n1\n1+x\n2\nx∈R\n4",
+      "estimatedMinutes": 15,
+      "hints": [],
+      "order": 4
+    },
+    {
+      "id": "subtask_5_1774379333204",
+      "title": "A few things about Python and Maltab",
+      "description": "In Python withnumpy, thenumpy.dot()function can be use for inner products,\nmatrix vector products, as well as matrix matrix products. From Python 3.6 at\nleast and the correspondingnumpypackage, one can also use theinfixnotation\n@. In Python-numpy, the transpose of a arraymism.T. The submodulelinalg\nofnumpycontains many standard linear algebra operations.\nIn Matlab almost all variables are matrices. Column vectors are matrices\nof size (n,1) while line vectors are matrices of size (n,1). The matrix-matrix\nmultiplication simply uses ”∗”. Transposition is denoted with an apostrophe,\nthe transpose ofmism\n′\n.\nA note on relevant software\nWe recommend that you select python 3.6 or higher as your programming lan-\nguage, preferably from Anaconda, with thenumpyandscipypackages. Matlab,\nC, C++ may be other possibilities. Still we recommend that you select the lan-\nguage you are most confident in. We however assume that you will use Python\nandnumpy. If you still wish to use another programming language, you should\nhave some knowledge about linear algebra libraries for this language. With Mat-\nlab, this is straightforward, the name itself stands for ”MATrix LABoratory”.\nThe focus should be on learning the methods and not learning a new pro-\ngramming language. If you wish to use Matlab, you may download and install\nthis from the “Softwarebiblioteket” available at KUnet.\n5",
+      "estimatedMinutes": 15,
+      "hints": [],
+      "order": 5
+    }
+  ],
+  "sourceText": "Assignment 1:  Linear Algebra, Differential\nCalculus\nVision and Image Processing\nSerge Belongie, Hang Yin\nThis is the first mandatory assignment on the course Vision and Image Process-\ning.  The goal for you is to get familiar with vector and matrix operations as\nwell as some computations of derivatives and gradients.\nThis assignment must be solved individually.  You have to pass this\nand  the  following  mandatory  assignments  and  quizzes  in  order  to  pass  this\ncourse.   If  you  do  not  pass  the  assignment,  but  you  have  made  a  SERIOUS\nattempt, you will get a second chance of submitting a new solution.\nThe deadline for this assignment is Monday 25/11, 2024 at 22:00.\nYou must submit your solution electronically via the Absalon homepage.  Go to\nthe assignments list and choose this assignment and upload your solution prior\nto the deadline.  Remember to include your name and KU user name (login for\nKUnet) in the solution.\n1  Vector Matrix Calculations, pen and paper\n1.  Letvbe the vector [−2,b,7,2,a]\nT\n.  Computev\nT\nvandvv\nT\n.\n2.  LetAandBthe following matrices\nA=\n\n\n−54−6\n34−6\n8−68\n\n\n,  B=\n\n\n−48\n−5−9\n4−7\n\n\nComputev=B.[x,y]\nT\n,w=A.v.   Then  computeC=A.Bandz=\nC.[x,y]\nT\n.\n3.  LetAbe the matrix:\nA=\n\n\n1−1−1\n8−x  x−6x−6\nx−7    5−x5−x\n\n\nCompute respectivelyA\n2\n=A.AandA\n3\n=A.A.A.  Such a matrixAis\ncallednilpotent.\n1\n\n4.  LetAbe the matrix\nA=\n\n\n−9572−4\n−144109−6\n76−573\n\n\nLete\n1\n= [1,0,0]\nT\n,e\n2\n= [0,1,0]\nT\nande\n3\n= [0,0,1]\nT\n. Compute respectively\nthe solutionsf\n1\n,f\n2\nandf\n3\nof the linear systems\nA.f\n1\n=e\n1\n,  A.f\n2\n=e\n2\n,  A.f\n3\n=e\n3\n.\nLetBthe  matrix  which  columns  are  respectivelyf\n1\n,f\n2\nandf\n3\n.   Then\ncomputeA.BandB.A.  What does it mean?\n5.[optional]LetAandBbe  square  matrices  of  size  (n,n).   Show  that\n(A.B)\nT\n=B\nT\n.A\nT\n.\n2  Vector Matrix Calculations, Python\nIn this exercise, you are supposed to use Python and thenumpypackage.  If you\nknow Matlab, you can adapt the calculations to it.\nFrom your preferred Python programming environment, you should start by\nloadingnumpyby importing it.  It is standard to shortennumpyasnp.  See the\nslides for array declaration.\n>> import numpy as np\nJust to get your hands in the computations!\n1.  An inner and an outer product.  Compute the inner product of\na = np.array([17,6,-5.5,3])andb = np.array([-4.9,1.17,0,2]).\nUsenp.dot()or, preferably, the infix notation@.  Computing the outer\nproduct requires a bit of extra work.  Display theshapeofa,b.  andb.T\n(b.shapeandb.T.shape).  To force Python-numpyto distinguish between\ncolumn and line vectors, 1D arrays can be reshaped: Try this piece of code\ninteractively:\n>> print(a@b)\n>> a.shape = (4,1) # a matrix with 1 column (a column vector)\n>> b.shape = (4,1) # a matrix with 1 column (a column vector)\n>> print(a)\n>> print(b)\n>> print(b.shape)\n>> print(b.T.shape)\n>> print(a@b)\n>> print(a.T@b)\n>> print(float(a.T@b))\n>> print(a@b.T)\nWhat do you get?\n2\n\n2.  Lett=  [−3,2,11]\nT\n.   Compute  the  cross-productt×toftand  itself.\n(numpyhas a cross-product operation, feel free to implement yours).  Let\na= [−2,6,1]\nT\n.  Computeb=t×aandc=a×t.  Then compute the\ninner productst\nT\nbanda\nT\nb.\nTo a 3D vectort, one associates the matrix\nˆ\nt=\n\n\n0−t\n3\nt\n2\nt\n3\n0−t\n1\n−t\n2\nt\n1\n0\n\n\n3.  Write a function that takes a 3D vectortand associates the corresponding\nmatrix\nˆ\nt.  Withtandafrom the previous question, compute\nˆ\ntt(matrix\nvector product) as well as\nˆ\nta.  What do you get?\n4.  For  a  3D  vectorv,  the  operationv7→t×vislinear.   So  it  can  be\nrepresented by a matrix.  Which one?\n5.  Check that\nˆ\nt\nT\n=−\nˆ\nt.  Compute\nˆ\nt\n2\n=\nˆ\nt.\nˆ\nt(matrix-matrix product).  What\nis the transpose of\nˆ\nt\n2\n?  What about\nˆ\nt\n3\n=\nˆ\nt.\nˆ\nt.\nˆ\nt?  You may want first to\nperform numerical computations in Python!\n3  Derivatives\nFunctions of one variable.\n1.  Compute the derivativef\n′\n(x) off(x) =e\n−\nx\n2\n2\n(hint:  use the chain rule for\nthe exponential, see the tables below.)\n2.  Compute its second derivative,f\n′′\n(x).  (hint:  reuse the previous rule and\nLeibniz rule).\n3.  Plot on the same graphf(x),f\n′\n(x) andf\n′′\n(x), say forx∈[−7,7] (easy\nwith Python’smatplotlib).\n4.  Compute the derivativeg\n′\n(t) ofg(t) = cos(t)/sin(t).\nFunctions of several variables.  This exercise uses many of the derivation rules!\n5.  Letf(x,t) be the Gaussian distribution function of variancet,\nf(x,t) =\n1\n√\n2πt\ne\n−\nx\n2\n2t\n.\n6.  Compute\n∂f\n∂x\n(x,t), the first partial derivative off(x,t) with respect tox\n(remember that you have to assume thattis fixed and you use the rules of\nderivation for a function of one variable).  It is also called thex-derivative\noff(x,t).\n7.  Compute\n∂f\n∂t\n(x,t), thet-derivative off(x,t).\n8.  Compute\n∂\n2\nf\n∂x\n2\n(x,t), the second partial derivative offwith respect tox,\nthis is thex-derivative of\n∂f\n∂x\n(x,t).\n3\n\n9.  Then show that\n∂f\n∂t\n(x,t) =\n1\n2\n∂\n2\nf\n∂x\n2\n(x,t)\nThis  is  an  extremely  important  property  of  this  function,  especially  for\nmany computer vision applications, wheretwill play the role of aspatial\nscale parameter.\n10.  Plot these functions fort= 1,2,4, withx∈[−15,15].\n4  Some derivation rules and classical derivatives\nStandard derivation rules:f(x),g(x) are functions of the real variablex,λis a\nreal number.  The first derivative is denoted byf\n′\n(x), the second byf\n′′\n(x) (the\nthird is often denoted by byf\n′′′\n(x) while,  in general,  for higher order,  sayn,\nthen-th derivative is denoted byf\n(n)\n(x)).\nfunctionderivativerule name\nλf(x)λf\n′\n(x)scalar multiplication rule\nf(x) +g(x)f\n′\n(x) +g\n′\n(x)sum rule\nf(x)g(x)f\n′\n(x)g(x) +f(x)g\n′\n(x)Leibniz rule\nf(x)\ng(x)\nf\n′\n(x)g(x)−f(x)g\n′\n(x)\ng(x)\n2\nquotient rule\nf(g(x))f\n′\n(g(x))g\n′\n(x)chain rule\ne\nf(x)\nf\n′\n(x)e\nf(x)\nexponentiation rule (chain rule!)\nln|f(x)|\nf\n′\n(x)\nf(x)\nlogarithm rule\n(f(x)g(x))\n′′\nf\n′′\n(x)g(x) + 2f\n′\n(x)g\n′\n(x) +g\n′′\n(x)iterated Leibniz rule\nSome classical derivatives\nfunctionderivativedomain/remark\nx\nα\nαx\nα−1\nifαis not an integer,xshould be>0\ne\nx\ne\nx\nx∈R\nlnx\n1\nx\nx >0\n√\nx\n1\n2\n√\nx\nspecial case of first rule withα=\n1\n2\n,x >0\ncosx−sinxx∈R\nsinxcosxx∈R\ntanx\n1\ncos\n2\nx\nx̸=k±\nπ\n2\n,k∈Z\narcsinx\n1\n√\n1−x\n2\n−1< x <1\narccosx−\n1\n√\n1−x\n2\n−1< x <1\narctanx\n1\n1+x\n2\nx∈R\n4\n\n5  A few things about Python and Maltab\nIn Python withnumpy, thenumpy.dot()function can be use for inner products,\nmatrix vector products, as well as matrix matrix products.  From Python 3.6 at\nleast and the correspondingnumpypackage, one can also use theinfixnotation\n@.  In Python-numpy, the transpose of a arraymism.T.  The submodulelinalg\nofnumpycontains many standard linear algebra operations.\nIn Matlab almost all variables are matrices.  Column vectors are matrices\nof size (n,1) while line vectors are matrices of size (n,1).  The matrix-matrix\nmultiplication simply uses ”∗”.  Transposition is denoted with an apostrophe,\nthe transpose ofmism\n′\n.\nA note on relevant software\nWe recommend that you select python 3.6 or higher as your programming lan-\nguage, preferably from Anaconda, with thenumpyandscipypackages.  Matlab,\nC, C++ may be other possibilities.  Still we recommend that you select the lan-\nguage you are most confident in.  We however assume that you will use Python\nandnumpy.  If you still wish to use another programming language, you should\nhave some knowledge about linear algebra libraries for this language. With Mat-\nlab, this is straightforward, the name itself stands for ”MATrix LABoratory”.\nThe focus should be on learning the methods and not learning a new pro-\ngramming language.  If you wish to use Matlab, you may download and install\nthis from the “Softwarebiblioteket” available at KUnet.\n5"
+}

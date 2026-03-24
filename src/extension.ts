@@ -110,7 +110,7 @@ function registerCommands(context: vscode.ExtensionContext) {
         canSelectFolders: false,
         canSelectMany: false,
         filters: {
-          'Assignment Files': ['json'],
+          'Assignment Files': ['json', 'pdf'],
         },
         title: 'Select Assignment File',
       });
